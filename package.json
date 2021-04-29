@@ -1,9 +1,9 @@
 {
-  "name": "react-shopping-cart-project",
+  "name": "react-shopping-cart-hooks",
   "version": "1.0.0",
-  "description": "Assembler School: React Shopping Cart Project",
+  "description": "Assembler School: React Shopping Cart Hooks",
   "keywords": [
-    "react-shopping-cart-project",
+    "react-shopping-cart-hooks",
     "assembler school"
   ],
   "private": true,
@@ -74,10 +74,7 @@
     "lint:js": "eslint . --ext .js",
     "lint:js:fix": "npm run lint:js -- --fix",
     "lint:format": "prettier --write .",
-    "lint:format:check": "prettier --check .",
-    "prepare": "husky install",
-    "pre:commit": "lint-staged",
-    "pre:push": "npm run lint:js && npm run lint:format:check && npm run test:ci:all"
+    "lint:format:check": "prettier --check ."
   },
   "browserslist": {
     "production": [
@@ -93,6 +90,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/assembler-school/react-shopping-cart-project.git"
+    "url": "https://github.com/assembler-school/react-shopping-cart-hooks.git"
   }
 }

@@ -6,7 +6,7 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# Assembler School: React Shopping Cart React Router
+# Assembler School: React Shopping Cart Hooks
 
 In this project you will learn how to create a React.js and how to apply all the
 important concepts.
@@ -26,7 +26,7 @@ account:
 <img src="https://docs.github.com/assets/images/help/repository/fork_button.jpg" alt="Fork on GitHub" width='450'>
 
 ```
-$ git clone https://github.com/assembler-school/react-shopping-cart-react-router.git
+$ git clone https://github.com/assembler-school/react-shopping-cart-react-hooks.git
 ```
 
 ## Contents and Branches Naming Strategy
@@ -112,44 +112,6 @@ found in the doc that the academic team will provide you.
 - You must use semantic HTML5 elements for all the markup of the application
 - Once you are done, you can move on to the optional ones that are marked as
   `Extra 💯`
-
-### 1. `/new-product` route
-
-#### File
-
-```sh
-/src/App.js
-```
-
-1. uncomment all the code
-2. add the `Route` component for the path
-   1. path: `/new-product`
-   2. component: `NewProduct` from the pages folder
-   3. follow the code that is used to render the `Home` component route
-
-#### Test suite name
-
-@TODO
-
-### 2. `NewProductForm` component
-
-#### File
-
-```sh
-/src/components/NewProductForm/NewProductForm.js
-```
-
-1. uncomment all the code
-2. finish the `setState` code so that a `setSubmitted()` method can be called
-   that sets the `submitted: true` prop after a timeout, like `500ms`.
-3. this prop is used to conditionally render the
-   `{submitted && <Redirect to="/" />}` code in the same file
-4. this will save the new form and once the `submitted` prop is `true`, the form
-   will redirect to the home page
-
-#### Test suite name
-
-@TODO
 
 ## Project delivery
 

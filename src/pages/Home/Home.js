@@ -1,11 +1,16 @@
 import React from "react";
 
-import AppHeader from "../../components/AppHeader";
-import Main from "../../components/Main";
-import Footer from "../../components/Footer";
 import ProductsListing from "../../components/ProductsListing";
 import Cart from "../../components/Cart";
+import withLayout from "../../hoc/withLayout";
 
+/**
+ * Remove the following components from the component:
+ * 1. fragment
+ * 2. <AppHeader />
+ * 3. <Main />
+ * 4. <Footer />
+ */
 function Home({
   products,
   cartItems,
@@ -20,60 +25,58 @@ function Home({
   handleChange,
 }) {
   return (
-    <>
-      <AppHeader />
-      <Main className="container-fluid">
+    <div className="row">
+      <div className="col col-8">
         <div className="row">
-          <div className="col col-8">
-            <div className="row">
-              <div className="col col-12">
-                <header className="jumbotron">
-                  <h1 className="display-4">Shoe shop</h1>
-                  <p className="lead">
-                    This is the best shoe shop ever, you will never find a
-                    better one.
-                  </p>
-                  <p className="font-weight-bold">Buy now!</p>
-                </header>
-              </div>
-              {isLoading && (
-                <div className="col col-12">
-                  <h2>Loading products...</h2>
-                </div>
-              )}
-              {hasError && (
-                <div className="col col-12">
-                  <h2>Something went wrong...</h2>
-                  <pre>
-                    <code>{loadingError}</code>
-                  </pre>
-                </div>
-              )}
-              {!isLoading && !hasError && (
-                <div className="col col-12">
-                  <ProductsListing
-                    products={products}
-                    handleDownVote={handleDownVote}
-                    handleUpVote={handleUpVote}
-                    handleSetFavorite={handleSetFavorite}
-                    handleAddToCart={handleAddToCart}
-                  />
-                </div>
-              )}
-            </div>
+          <div className="col col-12">
+            <header className="jumbotron">
+              <h1 className="display-4">Shoe shop</h1>
+              <p className="lead">
+                This is the best shoe shop ever, you will never find a better
+                one.
+              </p>
+              <p className="font-weight-bold">Buy now!</p>
+            </header>
           </div>
-
-          <Cart
-            className="col col-4"
-            cartItems={cartItems}
-            handleRemove={handleRemove}
-            handleChange={handleChange}
-          />
+          {isLoading && (
+            <div className="col col-12">
+              <h2>Loading products...</h2>
+            </div>
+          )}
+          {hasError && (
+            <div className="col col-12">
+              <h2>Something went wrong...</h2>
+              <pre>
+                <code>{loadingError}</code>
+              </pre>
+            </div>
+          )}
+          {!isLoading && !hasError && (
+            <div className="col col-12">
+              <ProductsListing
+                products={products}
+                handleDownVote={handleDownVote}
+                handleUpVote={handleUpVote}
+                handleSetFavorite={handleSetFavorite}
+                handleAddToCart={handleAddToCart}
+              />
+            </div>
+          )}
         </div>
-      </Main>
-      <Footer />
-    </>
+      </div>
+
+      <Cart
+        className="col col-4"
+        cartItems={cartItems}
+        handleRemove={handleRemove}
+        handleChange={handleChange}
+      />
+    </div>
   );
 }
 
-export default Home;
+/**
+ * Export default the Home by wrapping it in the withLayout hoc
+ * export default withLayout(Home);
+ */
+export default withLayout(Home);
