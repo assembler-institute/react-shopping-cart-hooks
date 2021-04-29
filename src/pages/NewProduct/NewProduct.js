@@ -3,13 +3,6 @@ import React from "react";
 import NewProductForm from "../../components/NewProductForm";
 import withLayout from "../../hoc/withLayout";
 
-/**
- * Remove the following components from the component:
- * 1. fragment
- * 2. <AppHeader />
- * 3. <Main />
- * 4. <Footer />
- */
 function NewProduct({ saveNewProduct }) {
   return (
     <div className="row justify-content-center">
@@ -31,8 +24,4 @@ function NewProduct({ saveNewProduct }) {
   );
 }
 
-/**
- * Export default the NewProduct by wrapping it in the withLayout hoc
- * export default withLayout(NewProduct);
- */
 export default withLayout(NewProduct);
