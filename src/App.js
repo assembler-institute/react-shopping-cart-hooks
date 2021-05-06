@@ -6,21 +6,8 @@ import NewProduct from "./pages/NewProduct";
 
 import * as api from "./api";
 
-const LOCAL_STORAGE_KEY = "react-sc-state";
-
-function loadLocalStorageData() {
-  const prevItems = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-  if (!prevItems) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(prevItems);
-  } catch (error) {
-    return null;
-  }
-}
+import useLocalStorage from "./hooks/useLocalStorage";
+import loadLocalStorageItems from "./utils/loadLocalStorageItems";
 
 function buildNewCartItem(cartItem) {
   if (cartItem.quantity >= cartItem.unitsInStock) {
@@ -39,17 +26,26 @@ function buildNewCartItem(cartItem) {
   };
 }
 
+const PRODUCTS_LOCAL_STORAGE_KEY = "react-sc-state-products";
+const CART_ITEMS_LOCAL_STORAGE_KEY = "react-sc-state-cart-items";
+
 function App() {
-  const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
+  const [products, setProducts] = useState(() =>
+    loadLocalStorageItems(PRODUCTS_LOCAL_STORAGE_KEY, []),
+  );
+  const [cartItems, setCartItems] = useState(() =>
+    loadLocalStorageItems(CART_ITEMS_LOCAL_STORAGE_KEY, []),
+  );
+
+  useLocalStorage(products, PRODUCTS_LOCAL_STORAGE_KEY);
+  useLocalStorage(cartItems, CART_ITEMS_LOCAL_STORAGE_KEY);
+
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
 
   useEffect(() => {
-    const prevItems = loadLocalStorageData();
-
-    if (!prevItems) {
+    if (products.length === 0) {
       setIsLoading(true);
 
       api
@@ -63,20 +59,8 @@ function App() {
           setHasError(true);
           setLoadingError(error.message);
         });
-
-      return;
     }
-
-    setProducts(prevItems.products);
-    setCartItems(prevItems.cartItems);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({ cartItems, products }),
-    );
-  }, [products, cartItems]);
 
   function handleAddToCart(productId) {
     const prevCartItem = cartItems.find((item) => item.id === productId);
