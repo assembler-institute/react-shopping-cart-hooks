@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -38,68 +38,57 @@ function buildNewCartItem(cartItem) {
     quantity: cartItem.quantity + 1,
   };
 }
+function App() {
+  const [appData, setAppData] = useState({
+    products: [],
+    cartItems: [],
+    isLoading: false,
+    hasError: false,
+    loadingError: null,
+  });
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      products: [],
-      cartItems: [],
-      isLoading: false,
-      hasError: false,
-      loadingError: null,
-    };
-
-    this.handleAddToCart = this.handleAddToCart.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleDownVote = this.handleDownVote.bind(this);
-    this.handleUpVote = this.handleUpVote.bind(this);
-    this.handleSetFavorite = this.handleSetFavorite.bind(this);
-    this.saveNewProduct = this.saveNewProduct.bind(this);
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     const prevItems = loadLocalStorageData();
 
     if (!prevItems) {
-      this.setState({
+      setAppData((props) => ({
+        ...props,
         isLoading: true,
-      });
+      }));
 
       api.getProducts().then((data) => {
-        this.setState({
+        setAppData((prevState) => ({
+          ...prevState,
           products: data,
           isLoading: false,
-        });
+        }));
       });
       return;
     }
-
-    this.setState({
+    setAppData((props) => ({
+      ...props,
       cartItems: prevItems.cartItems,
       products: prevItems.products,
-    });
-  }
+    }));
+  }, []);
 
-  componentDidUpdate() {
-    const { cartItems, products } = this.state;
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appData));
+  }, [appData.products, appData.cartItems]);
 
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({ cartItems, products }),
+  function handleAddToCart(productId) {
+    //   const { cartItems, products } = this.state;
+
+    const prevCartItem = appData.cartItems.find(
+      (item) => item.id === productId,
     );
-  }
-
-  handleAddToCart(productId) {
-    const { cartItems, products } = this.state;
-
-    const prevCartItem = cartItems.find((item) => item.id === productId);
-    const foundProduct = products.find((product) => product.id === productId);
+    const foundProduct = appData.products.find(
+      (product) => product.id === productId,
+    );
+    console.log(prevCartItem);
 
     if (prevCartItem) {
-      const updatedCartItems = cartItems.map((item) => {
+      const updatedCartItems = appData.cartItems.map((item) => {
         if (item.id !== productId) {
           return item;
         }
@@ -114,20 +103,24 @@ class App extends Component {
         };
       });
 
-      this.setState({ cartItems: updatedCartItems });
+      setAppData((props) => ({
+        ...props,
+        cartItems: updatedCartItems,
+      }));
       return;
     }
 
     const updatedProduct = buildNewCartItem(foundProduct);
-    this.setState((prevState) => ({
+    setAppData((prevState) => ({
+      ...prevState,
       cartItems: [...prevState.cartItems, updatedProduct],
     }));
   }
 
-  handleChange(event, productId) {
-    const { cartItems } = this.state;
+  function handleChange(event, productId) {
+    // const { cartItems } = this.state;
 
-    const updatedCartItems = cartItems.map((item) => {
+    const updatedCartItems = appData.cartItems.map((item) => {
       if (item.id === productId && item.quantity <= item.unitsInStock) {
         return {
           ...item,
@@ -138,22 +131,28 @@ class App extends Component {
       return item;
     });
 
-    this.setState({ cartItems: updatedCartItems });
-  }
-
-  handleRemove(productId) {
-    const { cartItems } = this.state;
-    const updatedCartItems = cartItems.filter((item) => item.id !== productId);
-
-    this.setState({
+    setAppData((props) => ({
+      ...props,
       cartItems: updatedCartItems,
-    });
+    }));
   }
 
-  handleDownVote(productId) {
-    const { products } = this.state;
+  function handleRemove(productId) {
+    // const { cartItems } = this.state;
+    const updatedCartItems = appData.cartItems.filter(
+      (item) => item.id !== productId,
+    );
 
-    const updatedProducts = products.map((product) => {
+    setAppData((props) => ({
+      ...props,
+      cartItems: updatedCartItems,
+    }));
+  }
+
+  function handleDownVote(productId) {
+    // const { products } = this.state;
+
+    const updatedProducts = appData.products.map((product) => {
       if (
         product.id === productId &&
         product.votes.downVotes.currentValue <
@@ -174,13 +173,16 @@ class App extends Component {
       return product;
     });
 
-    this.setState({ products: updatedProducts });
+    setAppData((props) => ({
+      ...props,
+      products: updatedProducts,
+    }));
   }
 
-  handleUpVote(productId) {
-    const { products } = this.state;
+  function handleUpVote(productId) {
+    // const { products } = this.state;
 
-    const updatedProducts = products.map((product) => {
+    const updatedProducts = appData.products.map((product) => {
       if (
         product.id === productId &&
         product.votes.upVotes.currentValue < product.votes.upVotes.upperLimit
@@ -200,13 +202,16 @@ class App extends Component {
       return product;
     });
 
-    this.setState({ products: updatedProducts });
+    setAppData((props) => ({
+      ...props,
+      products: updatedProducts,
+    }));
   }
 
-  handleSetFavorite(productId) {
-    const { products } = this.state;
+  function handleSetFavorite(productId) {
+    // const { products } = this.state;
 
-    const updatedProducts = products.map((product) => {
+    const updatedProducts = appData.products.map((product) => {
       if (product.id === productId) {
         return {
           ...product,
@@ -217,58 +222,62 @@ class App extends Component {
       return product;
     });
 
-    this.setState({ products: updatedProducts });
+    setAppData((props) => ({
+      ...props,
+      products: updatedProducts,
+    }));
   }
 
-  saveNewProduct(newProduct) {
-    this.setState((prevState) => ({
+  function saveNewProduct(newProduct) {
+    setAppData((prevState) => ({
+      ...prevState,
       products: [newProduct, ...prevState.products],
       newProductFormOpen: !prevState.newProductFormOpen,
     }));
   }
 
-  render() {
-    const {
-      cartItems,
-      products,
-      isLoading,
-      hasError,
-      loadingError,
-    } = this.state;
+  // render() {
+  //   const {
+  //     cartItems,
+  //     products,
+  //     isLoading,
+  //     hasError,
+  //     loadingError,
+  //   } = this.state;
 
-    return (
-      <BrowserRouter>
-        <Route
-          path="/"
-          exact
-          render={(routeProps) => (
-            <Home
-              {...routeProps}
-              fullWidth
-              cartItems={cartItems}
-              products={products}
-              isLoading={isLoading}
-              hasError={hasError}
-              loadingError={loadingError}
-              handleDownVote={this.handleDownVote}
-              handleUpVote={this.handleUpVote}
-              handleSetFavorite={this.handleSetFavorite}
-              handleAddToCart={this.handleAddToCart}
-              handleRemove={this.handleRemove}
-              handleChange={this.handleChange}
-            />
-          )}
-        />
-        <Route
-          path="/new-product"
-          exact
-          render={(routeProps) => (
-            <NewProduct {...routeProps} saveNewProduct={this.saveNewProduct} />
-          )}
-        />
-      </BrowserRouter>
-    );
-  }
+  return (
+    <BrowserRouter>
+      <Route
+        path="/"
+        exact
+        render={(routeProps) => (
+          <Home
+            {...routeProps}
+            fullWidth
+            cartItems={appData.cartItems}
+            products={appData.products}
+            isLoading={appData.isLoading}
+            hasError={appData.hasError}
+            loadingError={appData.loadingError}
+            handleDownVote={handleDownVote}
+            handleUpVote={handleUpVote}
+            handleSetFavorite={handleSetFavorite}
+            handleAddToCart={handleAddToCart}
+            handleRemove={handleRemove}
+            handleChange={handleChange}
+          />
+        )}
+      />
+      <Route
+        path="/new-product"
+        exact
+        render={(routeProps) => (
+          <NewProduct {...routeProps} saveNewProduct={saveNewProduct} />
+        )}
+      />
+    </BrowserRouter>
+  );
 }
+// }
 
 export default App;
