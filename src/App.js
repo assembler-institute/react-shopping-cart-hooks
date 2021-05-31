@@ -52,10 +52,17 @@ function App() {
     if (!prevItems) {
       setIsLoading(true);
 
-      api.getProducts().then((data) => {
-        setProducts(data);
-        setIsLoading(false);
-      });
+      api
+        .getProducts()
+        .then((data) => {
+          setProducts(data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          setIsLoading(false);
+          setHasError(true);
+          setLoadingError(error.message);
+        });
       return;
     }
     setCartItems(prevItems.cartItems);
@@ -70,8 +77,6 @@ function App() {
   }, [products, cartItems]);
 
   const handleAddToCart = (productId) => {
-    const { cartItems, products } = this.state;
-
     const prevCartItem = cartItems.find((item) => item.id === productId);
     const foundProduct = products.find((product) => product.id === productId);
 
