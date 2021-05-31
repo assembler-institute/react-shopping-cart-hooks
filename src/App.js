@@ -39,6 +39,22 @@ function buildNewCartItem(cartItem) {
   };
 }
 
+// Set initial state
+
+// const [products, setProducts] = useState([]);
+// const [cartItems, setCartItems] = useState([]);
+// const [iLoading, setLoading] = useState(false);
+// const [hasError, handleError] = useState(false);
+// const [loadingError, handleLoadingError] = useState(null);
+
+// Component did update
+
+// useEffect(() => {localStorage.setItem(
+//   LOCAL_STORAGE_KEY,
+//   JSON.stringify({ cartItems, products }),
+//   );
+// }, [cartItems, products]);
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -64,11 +80,14 @@ class App extends Component {
     const prevItems = loadLocalStorageData();
 
     if (!prevItems) {
+      // setLoading(true);
       this.setState({
         isLoading: true,
       });
 
       api.getProducts().then((data) => {
+        // setProducts(data);
+        // setLoading(false);
         this.setState({
           products: data,
           isLoading: false,
@@ -77,6 +96,8 @@ class App extends Component {
       return;
     }
 
+    // setCartItems(prevItems.cartItems);
+    // products(prevItems.products);
     this.setState({
       cartItems: prevItems.cartItems,
       products: prevItems.products,
