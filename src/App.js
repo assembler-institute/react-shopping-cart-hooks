@@ -191,7 +191,6 @@ function App() {
     setForm((prevState) => !prevState);
     // eslint-disable-next-line no-console
     console.log(newProductFormOpen);
-    // Change setForm state
   }
 
   return (
