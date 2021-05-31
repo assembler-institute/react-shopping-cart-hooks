@@ -5,20 +5,22 @@ import Home from "./pages/Home";
 import NewProduct from "./pages/NewProduct";
 
 import * as api from "./api";
+import useLocalStorage from "./customHooks/useLocalStorage";
 
-const LOCAL_STORAGE_KEY = "react-sc-state";
+const CART_LOCAL_STORAGE_KEY = "react-sc-state-cart";
+const PRODUCTS_LOCAL_STORAGE_KEY = "react-sc-state-products";
 
-function loadLocalStorageData() {
-  const prevItems = localStorage.getItem(LOCAL_STORAGE_KEY);
+function loadLocalStorageData(localStorageKey, defaultValue) {
+  const prevItems = localStorage.getItem(localStorageKey);
 
   if (!prevItems) {
-    return null;
+    return defaultValue;
   }
 
   try {
     return JSON.parse(prevItems);
   } catch (error) {
-    return null;
+    return defaultValue;
   }
 }
 
@@ -40,16 +42,21 @@ function buildNewCartItem(cartItem) {
 }
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
+  const [products, setProducts] = useState(() =>
+    loadLocalStorageData(CART_LOCAL_STORAGE_KEY, []),
+  );
+  const [cartItems, setCartItems] = useState(() =>
+    loadLocalStorageData(PRODUCTS_LOCAL_STORAGE_KEY, []),
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [loadingError, setLoadingError] = useState(null);
 
-  useEffect(() => {
-    const prevItems = loadLocalStorageData();
+  useLocalStorage(cartItems, CART_LOCAL_STORAGE_KEY);
+  useLocalStorage(products, PRODUCTS_LOCAL_STORAGE_KEY);
 
-    if (!prevItems) {
+  useEffect(() => {
+    if (products.length === 0) {
       setIsLoading(true);
 
       api
@@ -63,18 +70,8 @@ function App() {
           setHasError(true);
           setLoadingError(error.message);
         });
-      return;
     }
-    setCartItems(prevItems.cartItems);
-    setProducts(prevItems.products);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({ cartItems, products }),
-    );
-  }, [products, cartItems]);
 
   const handleAddToCart = (productId) => {
     const prevCartItem = cartItems.find((item) => item.id === productId);
