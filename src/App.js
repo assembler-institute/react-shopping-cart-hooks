@@ -108,7 +108,7 @@ function App() {
     }
 
     const updatedProduct = buildNewCartItem(foundProduct);
-    setCartItems((prevState) => [...prevState, updatedProduct]);
+    setCartItems((prevData) => [...prevData, updatedProduct]);
   }
 
   function handleChange(event, productId) {
@@ -197,8 +197,8 @@ function App() {
   }
 
   function saveNewProduct(newProduct) {
-    setProducts((prevState) => [newProduct, ...prevState]);
-    setNewProductFormOpen((prevState) => !prevState);
+    setProducts((prevData) => [newProduct, ...prevData]);
+    setNewProductFormOpen((prevData) => !prevData);
   }
 
   return (
