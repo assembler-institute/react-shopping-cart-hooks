@@ -39,6 +39,28 @@ function buildNewCartItem(cartItem) {
   };
 }
 
+function useLocalStorage(setLoad, setProducts) {
+  const prevItems = loadLocalStorageData();
+
+  if (!prevItems) {
+    setLoad((prevLoaded) => ({
+      ...prevLoaded,
+      isLoading: true,
+    }));
+
+    api.getProducts().then((data) => {
+      setProducts(data);
+      setLoad((prevLoaded) => ({
+        ...prevLoaded,
+        isLoading: false,
+      }));
+    });
+    return prevItems;
+  }
+
+  return prevItems;
+}
+
 function App() {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -49,24 +71,7 @@ function App() {
   });
 
   useEffect(() => {
-    const prevItems = loadLocalStorageData();
-
-    if (!prevItems) {
-      setLoad((prevLoaded) => ({
-        ...prevLoaded,
-        isLoading: true,
-      }));
-
-      api.getProducts().then((data) => {
-        setProducts(data);
-        setLoad((prevLoaded) => ({
-          ...prevLoaded,
-          isLoading: false,
-        }));
-      });
-      return;
-    }
-
+    const prevItems = useLocalStorage(setLoad, setProducts);
     setProducts(prevItems.products);
     setCartItems(prevItems.cartItems);
   }, []);
