@@ -1,26 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 import Home from "./pages/Home";
 import NewProduct from "./pages/NewProduct";
 
 import * as api from "./api";
-
-const LOCAL_STORAGE_KEY = "react-sc-state";
-
-function loadLocalStorageData() {
-  const prevItems = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-  if (!prevItems) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(prevItems);
-  } catch (error) {
-    return null;
-  }
-}
 
 function buildNewCartItem(cartItem) {
   if (cartItem.quantity >= cartItem.unitsInStock) {
@@ -48,11 +33,10 @@ function App() {
     loadingError: null,
     newProductFormOpen: false,
   });
+  const [prevItems] = useLocalStorage(cartItems, products);
 
   // componentDidMount
   useEffect(() => {
-    const prevItems = loadLocalStorageData();
-
     if (!prevItems) {
       setDataState((prevData) => ({ ...prevData, isLoading: true }));
 
@@ -66,14 +50,6 @@ function App() {
     setProducts(prevItems.products);
     setCartItems(prevItems.cartItems);
   }, []);
-
-  // componentDidUpdate
-  useEffect(() => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({ cartItems, products }),
-    );
-  }, [cartItems, products]);
 
   function handleAddToCart(productId) {
     const prevCartItem = cartItems.find((item) => item.id === productId);
