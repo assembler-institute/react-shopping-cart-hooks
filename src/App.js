@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import NewProduct from "./pages/NewProduct";
 
 import * as api from "./api";
-import useLocalStorage from "./customHooks/useLocalStorage";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 const CART_LOCAL_STORAGE_KEY = "react-sc-state-cart";
 const PRODUCTS_LOCAL_STORAGE_KEY = "react-sc-state-products";
