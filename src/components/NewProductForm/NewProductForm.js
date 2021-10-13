@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import { Formik } from "formik";
@@ -32,30 +32,17 @@ function addProductDetails(product) {
     },
   };
 }
+function NewProductForm (props){
+  const [submitted, setSubmitted]= useState(false)
 
-class NewProductForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      submitted: false,
-    };
-
-    this.setSubmitted = this.setSubmitted.bind(this);
+  function handleSubmitted(){
+    setTimeout(()=>{
+      setSubmitted(true)
+    },500);
   }
 
-  setSubmitted() {
-    setTimeout(() => {
-      this.setState({
-        submitted: true,
-      });
-    }, 500);
-  }
-
-  render() {
-    const { submitted } = this.state;
-    const { saveNewProduct } = this.props;
-
-    return (
+const {saveNewProduct}=props
+  return (
       <>
         <Formik
           initialValues={{
@@ -74,7 +61,7 @@ class NewProductForm extends Component {
             const newProduct = addProductDetails(values);
             saveNewProduct(newProduct);
             setSubmitting(true);
-            this.setSubmitted();
+            handleSubmitted();
           }}
         >
           {({
@@ -198,6 +185,6 @@ class NewProductForm extends Component {
       </>
     );
   }
-}
+
 
 export default NewProductForm;
