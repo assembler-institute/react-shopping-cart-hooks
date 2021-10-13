@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -39,39 +39,62 @@ function buildNewCartItem(cartItem) {
   };
 }
 
-function App() {
-  const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [loadingError, setLoadingError] = useState(null);
-  const [newProductFormOpen, setNewProductFormOpen] = useState();
+class App extends Component {
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
+    this.state = {
+      products: [],
+      cartItems: [],
+      isLoading: false,
+      hasError: false,
+      loadingError: null,
+    };
+
+    this.handleAddToCart = this.handleAddToCart.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleDownVote = this.handleDownVote.bind(this);
+    this.handleUpVote = this.handleUpVote.bind(this);
+    this.handleSetFavorite = this.handleSetFavorite.bind(this);
+    this.saveNewProduct = this.saveNewProduct.bind(this);
+  }
+
+  componentDidMount() {
     const prevItems = loadLocalStorageData();
 
     if (!prevItems) {
-      setIsLoading(true);
+      this.setState({
+        isLoading: true,
+      });
 
       api.getProducts().then((data) => {
-        setProducts(data);
-        setIsLoading(false);
+        this.setState({
+          products: data,
+          isLoading: false,
+        });
       });
       return;
     }
 
-    setCartItems(prevItems.cartItems);
-    setProducts(prevItems.products);
-  }, []);
+    this.setState({
+      cartItems: prevItems.cartItems,
+      products: prevItems.products,
+    });
+  }
 
-  useEffect(() => {
+  componentDidUpdate() {
+    const { cartItems, products } = this.state;
+
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
       JSON.stringify({ cartItems, products }),
     );
-  }, [cartItems, products]);
+  }
 
-  const handleAddToCart = (productId) => {
+  handleAddToCart(productId) {
+    const { cartItems, products } = this.state;
+
     const prevCartItem = cartItems.find((item) => item.id === productId);
     const foundProduct = products.find((product) => product.id === productId);
 
@@ -90,18 +113,20 @@ function App() {
           quantity: item.quantity + 1,
         };
       });
-      setCartItems(updatedCartItems);
+
+      this.setState({ cartItems: updatedCartItems });
       return;
     }
 
     const updatedProduct = buildNewCartItem(foundProduct);
+    this.setState((prevState) => ({
+      cartItems: [...prevState.cartItems, updatedProduct],
+    }));
+  }
 
-    setCartItems((prevState) => {
-      return [...prevState, updatedProduct];
-    });
-  };
+  handleChange(event, productId) {
+    const { cartItems } = this.state;
 
-  const handleChange = (event, productId) => {
     const updatedCartItems = cartItems.map((item) => {
       if (item.id === productId && item.quantity <= item.unitsInStock) {
         return {
@@ -112,16 +137,22 @@ function App() {
 
       return item;
     });
-    setCartItems(updatedCartItems);
-  };
 
-  const handleRemove = (productId) => {
+    this.setState({ cartItems: updatedCartItems });
+  }
+
+  handleRemove(productId) {
+    const { cartItems } = this.state;
     const updatedCartItems = cartItems.filter((item) => item.id !== productId);
 
-    setCartItems(updatedCartItems);
-  };
+    this.setState({
+      cartItems: updatedCartItems,
+    });
+  }
 
-  const handleDownVote = (productId) => {
+  handleDownVote(productId) {
+    const { products } = this.state;
+
     const updatedProducts = products.map((product) => {
       if (
         product.id === productId &&
@@ -142,10 +173,13 @@ function App() {
 
       return product;
     });
-    setProducts(updatedProducts);
-  };
 
-  const handleUpVote = (productId) => {
+    this.setState({ products: updatedProducts });
+  }
+
+  handleUpVote(productId) {
+    const { products } = this.state;
+
     const updatedProducts = products.map((product) => {
       if (
         product.id === productId &&
@@ -165,10 +199,13 @@ function App() {
 
       return product;
     });
-    setProducts(updatedProducts);
-  };
 
-  const handleSetFavorite = (productId) => {
+    this.setState({ products: updatedProducts });
+  }
+
+  handleSetFavorite(productId) {
+    const { products } = this.state;
+
     const updatedProducts = products.map((product) => {
       if (product.id === productId) {
         return {
@@ -180,50 +217,58 @@ function App() {
       return product;
     });
 
-    setProducts(updatedProducts);
-  };
+    this.setState({ products: updatedProducts });
+  }
 
-  const saveNewProduct = (newProduct) => {
-    setProducts((prevState) => {
-      return [newProduct, ...prevState];
-    });
-    setNewProductFormOpen((prevState) => {
-      return !prevState;
-    });
-  };
+  saveNewProduct(newProduct) {
+    this.setState((prevState) => ({
+      products: [newProduct, ...prevState.products],
+      newProductFormOpen: !prevState.newProductFormOpen,
+    }));
+  }
 
-  return (
-    <BrowserRouter>
-      <Route
-        path="/"
-        exact
-        render={(routeProps) => (
-          <Home
-            {...routeProps}
-            fullWidth
-            cartItems={cartItems}
-            products={products}
-            isLoading={isLoading}
-            hasError={hasError}
-            loadingError={loadingError}
-            handleDownVote={handleDownVote}
-            handleUpVote={handleUpVote}
-            handleSetFavorite={handleSetFavorite}
-            handleAddToCart={handleAddToCart}
-            handleRemove={handleRemove}
-            handleChange={handleChange}
-          />
-        )}
-      />
-      <Route
-        path="/new-product"
-        exact
-        render={(routeProps) => (
-          <NewProduct {...routeProps} saveNewProduct={saveNewProduct} />
-        )}
-      />
-    </BrowserRouter>
-  );
+  render() {
+    const {
+      cartItems,
+      products,
+      isLoading,
+      hasError,
+      loadingError,
+    } = this.state;
+
+    return (
+      <BrowserRouter>
+        <Route
+          path="/"
+          exact
+          render={(routeProps) => (
+            <Home
+              {...routeProps}
+              fullWidth
+              cartItems={cartItems}
+              products={products}
+              isLoading={isLoading}
+              hasError={hasError}
+              loadingError={loadingError}
+              handleDownVote={this.handleDownVote}
+              handleUpVote={this.handleUpVote}
+              handleSetFavorite={this.handleSetFavorite}
+              handleAddToCart={this.handleAddToCart}
+              handleRemove={this.handleRemove}
+              handleChange={this.handleChange}
+            />
+          )}
+        />
+        <Route
+          path="/new-product"
+          exact
+          render={(routeProps) => (
+            <NewProduct {...routeProps} saveNewProduct={this.saveNewProduct} />
+          )}
+        />
+      </BrowserRouter>
+    );
+  }
 }
 
 export default App;
