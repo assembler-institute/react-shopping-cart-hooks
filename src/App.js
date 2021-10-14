@@ -22,7 +22,7 @@ function loadLocalStorageData() {
   }
 }
 
-function buildNewCartItem(cartItem) {
+const buildNewCartItem = (cartItem) => {
   if (cartItem.quantity >= cartItem.unitsInStock) {
     return cartItem;
   }
@@ -37,7 +37,7 @@ function buildNewCartItem(cartItem) {
     updatedAt: cartItem.updatedAt,
     quantity: cartItem.quantity + 1,
   };
-}
+};
 
 function App() {
   const [allStates, setAllStates] = useState({
@@ -119,7 +119,7 @@ function App() {
 
     setAllStates((prevState) => ({
       ...prevState,
-      cartItems: updatedProduct,
+      cartItems: [...prevState.cartItems, updatedProduct],
     }));
   };
 
@@ -199,7 +199,7 @@ function App() {
     });
     setAllStates((prevState) => ({
       ...prevState,
-      cartItems: updatedProducts,
+      products: updatedProducts,
     }));
   };
 
@@ -217,7 +217,7 @@ function App() {
 
     setAllStates((prevState) => ({
       ...prevState,
-      cartItems: updatedProducts,
+      products: updatedProducts,
     }));
   };
 

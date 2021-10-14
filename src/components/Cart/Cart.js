@@ -3,13 +3,15 @@ import React from "react";
 import ShoppingCartItem from "../ShoppingCartItem";
 import Button from "../Button";
 
-function getCartTotal(cart) {
+const getCartTotal = (cart) => {
+  console.log("im the cart");
   return cart.reduce((accum, item) => {
     return accum + item.price * item.quantity;
   }, 0);
-}
+};
 
 function Cart({ cartItems, handleRemove, handleChange, ...props }) {
+  console.log("Im the cartItems in Cart", cartItems);
   return (
     <aside {...props}>
       <div className="row flex-column">
