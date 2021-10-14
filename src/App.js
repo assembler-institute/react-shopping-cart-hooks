@@ -50,41 +50,50 @@ function App() {
   });
 
   useEffect(() => {
+    console.log("...Mounting");
     const prevItems = loadLocalStorageData();
     if (!prevItems) {
-      setAllStates((allStates.isLoading = true));
+      console.log("...Dentro ");
+      setAllStates((prevState) => ({ ...prevState, isLoading: true }));
 
       api.getProducts().then((data) => {
-        console.log(data);
-        setAllStates((allStates.products = data));
-        setAllStates((allStates.isLoading = false));
+        setAllStates((prevState) => ({ ...prevState, products: data }));
+        setAllStates((prevState) => ({ ...prevState, isLoading: false }));
+        console.log(allStates);
       });
       return;
     }
-    setAllStates((allStates.cartItems = prevItems.cartItems));
-    setAllStates((allStates.products = prevItems.products));
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: prevItems.cartItems,
+    }));
+    setAllStates((prevState) => ({
+      ...prevState,
+      products: prevItems.products,
+    }));
   }, []);
 
   useEffect(() => {
-    console.log("USEFFECT");
-    console.log(allStates, "allstates");
-    console.log(allStates.products);
-
-    console.log(allStates.products);
+    const { cartItems, products } = allStates;
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
       JSON.stringify({
-        allStates,
+        cartItems,
+        products,
       }),
     );
   }, [allStates.cartItems, allStates.products]);
 
   const handleAddToCart = (productId) => {
-    const prevCartItem = cartItems.find((item) => item.id === productId);
-    const foundProduct = products.find((product) => product.id === productId);
+    const prevCartItem = allStates.cartItems.find(
+      (item) => item.id === productId,
+    );
+    const foundProduct = allStates.products.find(
+      (product) => product.id === productId,
+    );
 
     if (prevCartItem) {
-      const updatedCartItems = cartItems.map((item) => {
+      const updatedCartItems = allStates.cartItems.map((item) => {
         if (item.id !== productId) {
           return item;
         }
@@ -98,19 +107,24 @@ function App() {
           quantity: item.quantity + 1,
         };
       });
-      setAllStates((allStates.cartItems = updatedCartItems));
+      setAllStates((prevState) => ({
+        ...prevState,
+        cartItems: updatedCartItems,
+      }));
+
       return;
     }
 
     const updatedProduct = buildNewCartItem(foundProduct);
 
-    setAllStates((prevState) => {
-      return (allStates.cartItems = [...prevState.cartItems, updatedProduct]);
-    });
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: updatedProduct,
+    }));
   };
 
   const handleChange = (event, productId) => {
-    const updatedCartItems = cartItems.map((item) => {
+    const updatedCartItems = allStates.cartItems.map((item) => {
       if (item.id === productId && item.quantity <= item.unitsInStock) {
         return {
           ...item,
@@ -120,16 +134,24 @@ function App() {
 
       return item;
     });
-    setAllStates((allStates.cartItems = updatedCartItems));
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: updatedCartItems,
+    }));
   };
 
   const handleRemove = (productId) => {
-    const updatedCartItems = cartItems.filter((item) => item.id !== productId);
-    setAllStates((allStates.cartItems = updatedCartItems));
+    const updatedCartItems = allStates.cartItems.filter(
+      (item) => item.id !== productId,
+    );
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: updatedCartItems,
+    }));
   };
 
   const handleDownVote = (productId) => {
-    const updatedProducts = products.map((product) => {
+    const updatedProducts = allStates.products.map((product) => {
       if (
         product.id === productId &&
         product.votes.downVotes.currentValue <
@@ -149,11 +171,14 @@ function App() {
 
       return product;
     });
-    setAllStates((allStates.products = updatedProducts));
+    setAllStates((prevState) => ({
+      ...prevState,
+      products: updatedProducts,
+    }));
   };
 
   const handleUpVote = (productId) => {
-    const updatedProducts = products.map((product) => {
+    const updatedProducts = allStates.products.map((product) => {
       if (
         product.id === productId &&
         product.votes.upVotes.currentValue < product.votes.upVotes.upperLimit
@@ -172,11 +197,14 @@ function App() {
 
       return product;
     });
-    setAllStates((allStates.products = updatedProducts));
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: updatedProducts,
+    }));
   };
 
   const handleSetFavorite = (productId) => {
-    const updatedProducts = products.map((product) => {
+    const updatedProducts = allStates.products.map((product) => {
       if (product.id === productId) {
         return {
           ...product,
@@ -187,20 +215,23 @@ function App() {
       return product;
     });
 
-    setAllStates((allStates.products = updatedProducts));
+    setAllStates((prevState) => ({
+      ...prevState,
+      cartItems: updatedProducts,
+    }));
   };
 
   const saveNewProduct = (newProduct) => {
     setAllStates((prevState) => {
-      return (allStates.products = [...prevState.products, newProduct]);
+      return { ...prevState, products: [...prevState.products, newProduct] };
     });
-    setAllStates((prevState) => {
-      return (allStates.newProductFormOpen = !prevState.newProductFormOpen);
-    });
+    setAllStates((prevState) => ({
+      ...prevState,
+      newProductFormOpen: !prevState.newProductFormOpen,
+    }));
   };
-  // console.log(allStates);
-  // const { cartItems, products, isLoading, hasError, loadingError } = allStates;
 
+  console.log(allStates.products, "productos");
   return (
     <BrowserRouter>
       <Route
