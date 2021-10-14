@@ -47,18 +47,19 @@ function App() {
   const [loadingError, setIsLoadingError] = useState(null);
 
 useEffect(()=>{
-  const prevItems = loadLocalStorageData();
-      if (!prevItems) {
+
+      if (products.length===0) {
         setIsLoading(true);
-      }
+      
        api.getProducts().then((data) => {
         setProducts(data)
         setIsLoading(false)
     })
+  }
    },[]);
 
 function handleAddToCart(productId) {
-  //find cartItems?
+  
   const prevItems = loadLocalStorageData();
   const cartItems=prevItems.cartItems;      
        const prevCartItem = cartItems.find((item) => item.id === productId);
