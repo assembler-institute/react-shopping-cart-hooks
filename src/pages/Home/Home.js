@@ -1,5 +1,7 @@
 import React from "react";
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import Loader from "react-loader-spinner";
 import ProductsListing from "../../components/ProductsListing";
 import Cart from "../../components/Cart";
 import withLayout from "../../hoc/withLayout";
@@ -32,13 +34,20 @@ function Home({
             </header>
           </div>
           {isLoading && (
-            <div className="col col-12">
-              <h2>Loading products...</h2>
-            </div>
+            <Loader
+              type="CradleLoader"
+              color="#00BFFF"
+              height={100}
+              width={100}
+              timeout={3000}
+            />
           )}
           {hasError && (
             <div className="col col-12">
-              <h2>Something went wrong...</h2>
+              <h2>
+                Give me another chance, please. I am broken, but I can fix
+                myself.
+              </h2>
               <pre>
                 <code>{loadingError}</code>
               </pre>

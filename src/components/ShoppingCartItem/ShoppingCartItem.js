@@ -1,7 +1,5 @@
 import React from "react";
-
 import "./ShoppingCartItem.scss";
-
 import Button from "../Button";
 
 function buildSelectOptions(unitsInStock) {
