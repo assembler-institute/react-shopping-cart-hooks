@@ -46,168 +46,212 @@ function App() {
   const [hasError, setHasError] = useState(false);
   const [loadingError, setIsLoadingError] = useState(null);
 
-useEffect(()=>{
-
-      if (products.length===0) {
-        setIsLoading(true);
-      
-       api.getProducts().then((data) => {
-        setProducts(data)
+  useEffect(() => {
+    const prevItems = loadLocalStorageData();
+    if (!prevItems) {
+      setIsLoading(true)
+      api.getProducts().then((data) => {
+        setProducts(data);
         setIsLoading(false)
-    })
-  }
-   },[]);
-
-function handleAddToCart(productId) {
-  
-  const prevItems = loadLocalStorageData();
-  const cartItems=prevItems.cartItems;      
-       const prevCartItem = cartItems.find((item) => item.id === productId);
-       const foundProduct = products.find((product) => product.id === productId);
-       if (prevCartItem) {
-        const updatedCartItems = cartItems.map((item) => {
-           if (item.id !== productId) {
-             return item;
-          }
-  
-           if (item.quantity >= item.unitsInStock) {
-             return item;
-           }
-  
-           return {
-             ...item,
-             quantity: item.quantity + 1,
-           }; 
-         });
-         
-         
-         setCartItems(updatedCartItems);
-         return;
-       }
-  
-       const updatedProduct = buildNewCartItem(foundProduct);
-       setCartItems((prevState) => [...prevState, updatedProduct]);       
-     }
-
-     function handleChange(event, productId) {
-           
-           const updatedCartItems = cartItems.map((item) => {
-             if (item.id === productId && item.quantity <= item.unitsInStock) {
-               return {
-                 ...item,
-                 quantity: Number(event.target.value),
-               };
-             }
-      
-             return item;
-           });
-      
-           setCartItems(updatedCartItems);
-         }
-    function handleRemove(productId) {
-              
-              const updatedCartItems = cartItems.filter((item) => item.id !== productId);
-          
-              setCartItems(updatedCartItems)
+      })
+      return
     }
-    function handleDownVote(productId) {
-      
-           const updatedProducts = products.map((product) => {
-             if (
-               product.id === productId &&
-               product.votes.downVotes.currentValue <
-                 product.votes.downVotes.lowerLimit
-             ) {
-               return {
-                 ...product,
-                 votes: {
-                   ...product.votes,
-                   downVotes: {
-                     ...product.votes.downVotes,
-                     currentValue: product.votes.downVotes.currentValue + 1,
-                   },
-                 },
-               };
-             }
-      
-             return product;
-           });           
-           setProducts( updatedProducts );
-         }
-    function handleUpVote(productId) {
-          const updatedProducts = products.map((product) => {
-            if (
-              product.id === productId &&
-              product.votes.upVotes.currentValue < product.votes.upVotes.upperLimit
-            ) {
-              return {
-                ...product,
-                votes: {
-                  ...product.votes,
-                  upVotes: {
-                    ...product.votes.upVotes,
-                    currentValue: product.votes.upVotes.currentValue + 1,
-                  },
-                },
-              };
-            }
-      
-            return product;
-          });
-      
+    setCartItems(prevItems.cartItems);
+    setProducts(prevItems.products)
+  }, [])
+
+
+
+  useEffect(() => {
+
+    localStorage.setItem(
+
+      LOCAL_STORAGE_KEY,
+
+      JSON.stringify({ cartItems, products }),
+
+    );
+
+  }, [cartItems, products])
+
+  function handleAddToCart(productId) {
+
+
+
+    const prevCartItem = cartItems.find((item) => item.id === productId);
+    
+    const foundProduct = products.find((product) => product.id === productId);
+    
+    
+    
+    if (prevCartItem) {
+    
+    const updatedCartItems = cartItems.map((item) => {
+    
+    if (item.id !== productId) {
+    
+    return item;
+    
+    }
+    
+    
+    
+    if (item.quantity >= item.unitsInStock) {
+    
+    return item;
+    
+    }
+    
+    
+    
+    return {
+    
+    ...item,
+    
+    quantity: item.quantity + 1,
+    
+    };
+    
+    });
+    
+    setCartItems(updatedCartItems)
+    
+    return;
+    
+    }
+    
+    
+    
+    const updatedProduct = buildNewCartItem(foundProduct);
+    
+    setCartItems((prevCartItems) => {
+    
+    return [...prevCartItems, updatedProduct]
+    
+    })
+    
+    }
+  function handleChange(event, productId) {
+
+    const updatedCartItems = cartItems.map((item) => {
+      if (item.id === productId && item.quantity <= item.unitsInStock) {
+        return {
+          ...item,
+          quantity: Number(event.target.value),
+        };
+      }
+
+      return item;
+    });
+
+    setCartItems(updatedCartItems);
+  }
+  function handleRemove(productId) {
+
+    const updatedCartItems = cartItems.filter((item) => item.id !== productId);
+
+    setCartItems(updatedCartItems)
+  }
+  function handleDownVote(productId) {
+
+    const updatedProducts = products.map((product) => {
+      if (
+        product.id === productId &&
+        product.votes.downVotes.currentValue <
+        product.votes.downVotes.lowerLimit
+      ) {
+        return {
+          ...product,
+          votes: {
+            ...product.votes,
+            downVotes: {
+              ...product.votes.downVotes,
+              currentValue: product.votes.downVotes.currentValue + 1,
+            },
+          },
+        };
+      }
+
+      return product;
+    });
     setProducts(updatedProducts);
   }
-        
+  function handleUpVote(productId) {
+    const updatedProducts = products.map((product) => {
+      if (
+        product.id === productId &&
+        product.votes.upVotes.currentValue < product.votes.upVotes.upperLimit
+      ) {
+        return {
+          ...product,
+          votes: {
+            ...product.votes,
+            upVotes: {
+              ...product.votes.upVotes,
+              currentValue: product.votes.upVotes.currentValue + 1,
+            },
+          },
+        };
+      }
+
+      return product;
+    });
+
+    setProducts(updatedProducts);
+  }
+
   function handleSetFavorite(productId) {
-          const updatedProducts = products.map((product) => {
-            if (product.id === productId) {
-              return {
-                ...product,
-                isFavorite: !product.isFavorite,
-              };
-            }
-      
-            return product;
-          });
-      
-          setProducts(updatedProducts);
+    const updatedProducts = products.map((product) => {
+      if (product.id === productId) {
+        return {
+          ...product,
+          isFavorite: !product.isFavorite,
+        };
+      }
+
+      return product;
+    });
+
+    setProducts(updatedProducts);
   }
   function saveNewProduct(newProduct) {
-     setProducts((prevState) => [newProduct, ...prevState]);
-   }
+    setProducts((prevState) => {
+      return [newProduct, ...prevState]
+    })
+  }
 
   return (
     <BrowserRouter>
-         <Route
-           path="/"
-           exact
-           render={(routeProps) => (
-             <Home
-               {...routeProps}
-               fullWidth
-               cartItems={cartItems}
-               products={products}
-               isLoading={isLoading}
-               hasError={hasError}
-               loadingError={loadingError}
-               handleDownVote={handleDownVote}
-               handleUpVote={handleUpVote}
-               handleSetFavorite={handleSetFavorite}
-               handleAddToCart={handleAddToCart}
-               handleRemove={handleRemove}
-               handleChange={handleChange}
-             />
-           )}
-         />
-         <Route
-           path="/new-product"
-           exact
-           render={(routeProps) => (
-             <NewProduct {...routeProps} saveNewProduct={saveNewProduct} />
-           )}
-         />
-       </BrowserRouter>
-     );
+      <Route
+        path="/"
+        exact
+        render={(routeProps) => (
+          <Home
+            {...routeProps}
+            fullWidth
+            cartItems={cartItems}
+            products={products}
+            isLoading={isLoading}
+            hasError={hasError}
+            loadingError={loadingError}
+            handleDownVote={handleDownVote}
+            handleUpVote={handleUpVote}
+            handleSetFavorite={handleSetFavorite}
+            handleAddToCart={handleAddToCart}
+            handleRemove={handleRemove}
+            handleChange={handleChange}
+          />
+        )}
+      />
+      <Route
+        path="/new-product"
+        exact
+        render={(routeProps) => (
+          <NewProduct {...routeProps} saveNewProduct={saveNewProduct} />
+        )}
+      />
+    </BrowserRouter>
+  );
 }
 
 export default App;
