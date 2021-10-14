@@ -48,22 +48,21 @@ function App() {
 
 useEffect(()=>{
   const prevItems = loadLocalStorageData();
-
       if (!prevItems) {
         setIsLoading(true);
-  
+      }
        api.getProducts().then((data) => {
         setProducts(data)
         setIsLoading(false)
     })
-   }
-},[]);
+   },[]);
 
 function handleAddToCart(productId) {
-  
+  //find cartItems?
+  const prevItems = loadLocalStorageData();
+  const cartItems=prevItems.cartItems;      
        const prevCartItem = cartItems.find((item) => item.id === productId);
        const foundProduct = products.find((product) => product.id === productId);
-  
        if (prevCartItem) {
         const updatedCartItems = cartItems.map((item) => {
            if (item.id !== productId) {
@@ -77,16 +76,18 @@ function handleAddToCart(productId) {
            return {
              ...item,
              quantity: item.quantity + 1,
-           };
+           }; 
          });
-  
+         
+         
          setCartItems(updatedCartItems);
          return;
        }
   
        const updatedProduct = buildNewCartItem(foundProduct);
-       setCartItems((prevState) => [...prevState, updatedProduct]);
+       setCartItems((prevState) => [...prevState, updatedProduct]);       
      }
+
      function handleChange(event, productId) {
            
            const updatedCartItems = cartItems.map((item) => {
@@ -129,8 +130,7 @@ function handleAddToCart(productId) {
              }
       
              return product;
-           });
-      
+           });           
            setProducts( updatedProducts );
          }
     function handleUpVote(productId) {
