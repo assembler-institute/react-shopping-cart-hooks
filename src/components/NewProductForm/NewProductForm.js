@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import { Formik } from "formik";
@@ -34,7 +34,7 @@ function addProductDetails(product) {
 }
 
 function NewProductForm({ saveNewProduct, ...props }) {
-  const [submitted, SetSubmitted] = SetState(false);
+  const [submitted, SetSubmitted] = useState(false);
 
   const setSubmittedFunction = () => {
     setTimeout(() => {
