@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { ContextState } from "../../context/contextState";
+import { ACTIONS } from "../../context/reducerState";
 
 import ShoppingCartItem from "../ShoppingCartItem";
-import Button from "../Button";
 
 function getCartTotal(cart) {
   return cart.reduce((accum, item) => {
@@ -10,6 +12,9 @@ function getCartTotal(cart) {
 }
 
 function Cart({ cartItems, handleRemove, handleChange, ...props }) {
+  const value = useContext(ContextState);
+  const { dispatch } = value;
+
   return (
     <aside {...props}>
       <div className="row flex-column">
@@ -49,7 +54,20 @@ function Cart({ cartItems, handleRemove, handleChange, ...props }) {
               <hr />
             </div>
             <div className="col">
-              <Button>Checkout</Button>
+              {cartItems.length > 0 && (
+                <Link
+                  className="btn btn-primary"
+                  to="/checkout/FirstStep"
+                  onClick={() =>
+                    dispatch({
+                      type: ACTIONS.ADD_PRODUCTS,
+                      payload: cartItems,
+                    })
+                  }
+                >
+                  Checkout
+                </Link>
+              )}
             </div>
           </div>
         </div>

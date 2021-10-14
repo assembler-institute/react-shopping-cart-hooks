@@ -1,5 +1,4 @@
 import React from "react";
-
 import NewProductForm from "../../components/NewProductForm";
 import withLayout from "../../hoc/withLayout";
 
