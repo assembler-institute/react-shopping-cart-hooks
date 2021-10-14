@@ -40,44 +40,36 @@ function buildNewCartItem(cartItem) {
 }
 
 function App() {
-  const [allStates, setAllStates] = useState({
-    products: [],
-    cartItems: [],
-    isLoading: false,
-    hasError: false,
-    loadingError: null,
-    newProductFormOpen: null,
-  });
+  const [products, setProducts] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [loadingError, setLoadingError] = useState(null);
+  const [newProductFormOpen, setNewProductFormOpen] = useState();
 
   useEffect(() => {
     const prevItems = loadLocalStorageData();
+
     if (!prevItems) {
-      setAllStates((allStates.isLoading = true));
+      setIsLoading(true);
 
       api.getProducts().then((data) => {
-        console.log(data);
-        setAllStates((allStates.products = data));
-        setAllStates((allStates.isLoading = false));
+        setProducts(data);
+        setIsLoading(false);
       });
       return;
     }
-    setAllStates((allStates.cartItems = prevItems.cartItems));
-    setAllStates((allStates.products = prevItems.products));
+
+    setCartItems(prevItems.cartItems);
+    setProducts(prevItems.products);
   }, []);
 
   useEffect(() => {
-    console.log("USEFFECT");
-    console.log(allStates, "allstates");
-    console.log(allStates.products);
-
-    console.log(allStates.products);
     localStorage.setItem(
       LOCAL_STORAGE_KEY,
-      JSON.stringify({
-        allStates,
-      }),
+      JSON.stringify({ cartItems, products }),
     );
-  }, [allStates.cartItems, allStates.products]);
+  }, [cartItems, products]);
 
   const handleAddToCart = (productId) => {
     const prevCartItem = cartItems.find((item) => item.id === productId);
@@ -98,14 +90,14 @@ function App() {
           quantity: item.quantity + 1,
         };
       });
-      setAllStates((allStates.cartItems = updatedCartItems));
+      setCartItems(updatedCartItems);
       return;
     }
 
     const updatedProduct = buildNewCartItem(foundProduct);
 
-    setAllStates((prevState) => {
-      return (allStates.cartItems = [...prevState.cartItems, updatedProduct]);
+    setCartItems((prevState) => {
+      return [...prevState, updatedProduct];
     });
   };
 
@@ -120,12 +112,13 @@ function App() {
 
       return item;
     });
-    setAllStates((allStates.cartItems = updatedCartItems));
+    setCartItems(updatedCartItems);
   };
 
   const handleRemove = (productId) => {
     const updatedCartItems = cartItems.filter((item) => item.id !== productId);
-    setAllStates((allStates.cartItems = updatedCartItems));
+
+    setCartItems(updatedCartItems);
   };
 
   const handleDownVote = (productId) => {
@@ -149,7 +142,7 @@ function App() {
 
       return product;
     });
-    setAllStates((allStates.products = updatedProducts));
+    setProducts(updatedProducts);
   };
 
   const handleUpVote = (productId) => {
@@ -172,7 +165,7 @@ function App() {
 
       return product;
     });
-    setAllStates((allStates.products = updatedProducts));
+    setProducts(updatedProducts);
   };
 
   const handleSetFavorite = (productId) => {
@@ -187,19 +180,17 @@ function App() {
       return product;
     });
 
-    setAllStates((allStates.products = updatedProducts));
+    setProducts(updatedProducts);
   };
 
   const saveNewProduct = (newProduct) => {
-    setAllStates((prevState) => {
-      return (allStates.products = [...prevState.products, newProduct]);
+    setProducts((prevState) => {
+      return [newProduct, ...prevState];
     });
-    setAllStates((prevState) => {
-      return (allStates.newProductFormOpen = !prevState.newProductFormOpen);
+    setNewProductFormOpen((prevState) => {
+      return !prevState;
     });
   };
-  // console.log(allStates);
-  // const { cartItems, products, isLoading, hasError, loadingError } = allStates;
 
   return (
     <BrowserRouter>
@@ -210,11 +201,11 @@ function App() {
           <Home
             {...routeProps}
             fullWidth
-            cartItems={allStates.cartItems}
-            products={allStates.products}
-            isLoading={allStates.isLoading}
-            hasError={allStates.hasError}
-            loadingError={allStates.loadingError}
+            cartItems={cartItems}
+            products={products}
+            isLoading={isLoading}
+            hasError={hasError}
+            loadingError={loadingError}
             handleDownVote={handleDownVote}
             handleUpVote={handleUpVote}
             handleSetFavorite={handleSetFavorite}
