@@ -18,7 +18,7 @@ function Cart({ cartItems, handleRemove, handleChange, ...props }) {
           <hr className="mb-3" />
         </div>
 
-        {cartItems.length > 0 ? (
+        {cartItems.length >0 ? (
           cartItems.map((item) => (
             <ShoppingCartItem
               key={item.id}
