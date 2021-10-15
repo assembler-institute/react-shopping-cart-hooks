@@ -50,38 +50,37 @@ function App() {
   });
 
   useEffect(() => {
-    console.log("...Mounting");
     const prevItems = loadLocalStorageData();
     if (!prevItems) {
-      console.log("...Dentro ");
       setAllStates((prevState) => ({ ...prevState, isLoading: true }));
 
       api.getProducts().then((data) => {
-        setAllStates((prevState) => ({ ...prevState, products: data }));
-        setAllStates((prevState) => ({ ...prevState, isLoading: false }));
-        console.log(allStates);
+        setAllStates((prevState) => ({
+          ...prevState,
+          products: data,
+          isLoading: false,
+        }));
       });
       return;
     }
     setAllStates((prevState) => ({
       ...prevState,
       cartItems: prevItems.cartItems,
-    }));
-    setAllStates((prevState) => ({
-      ...prevState,
       products: prevItems.products,
     }));
   }, []);
 
   useEffect(() => {
     const { cartItems, products } = allStates;
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify({
-        cartItems,
-        products,
-      }),
-    );
+    if (products.length > 0) {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          cartItems,
+          products,
+        }),
+      );
+    }
   }, [allStates.cartItems, allStates.products]);
 
   const handleAddToCart = (productId) => {
@@ -231,7 +230,6 @@ function App() {
     }));
   };
 
-  console.log(allStates.products, "productos");
   return (
     <BrowserRouter>
       <Route
