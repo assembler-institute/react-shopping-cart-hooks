@@ -42,19 +42,17 @@ function buildNewCartItem(cartItem) {
 function App(props) {
 	const [products, setProducts] = useState([]);
 	const [cartItems, setCartItems] = useState([]);
-	const [isLoading, setLoading] = useState(false);
-	const [hasError, setError] = useState(false);
-	const [loadingError, setLoadingError] = useState(null);
+	const [{ isLoading, hasError, loadingError }, setLoadingInfo] = useState({ isLoading: false, hasError: false, loadingError: null });
 
 	useEffect(() => {
 		const prevItems = loadLocalStorageData();
 
 		if (!prevItems) {
-			setLoading(() => true);
+			setLoadingInfo((prevState) => ({ ...prevState, isLoading: true }));
 
 			api.getProducts().then((data) => {
 				setProducts(() => data);
-				setLoading(() => false);
+				setLoadingInfo((prevState) => ({ ...prevState, isLoading: true }));
 			});
 
 			return;
