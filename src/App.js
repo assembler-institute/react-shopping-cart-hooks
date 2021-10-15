@@ -175,11 +175,6 @@ function App(props) {
 	}
 
 	function saveNewProduct(newProduct) {
-		// this.setState((prevState) => ({
-		//   products: [newProduct, ...prevState.products],
-		//   newProductFormOpen: !prevState.newProductFormOpen,
-		// }));
-
 		setProducts((prevProducts) => [newProduct, ...prevProducts]);
 	}
 
