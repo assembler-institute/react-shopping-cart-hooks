@@ -7,6 +7,7 @@ import Input from "../Input";
 import Button from "../Button";
 
 import productSchema from "./product-schema";
+import { useState } from "react/cjs/react.development";
 
 function addProductDetails(product) {
   return {
@@ -33,27 +34,19 @@ function addProductDetails(product) {
   };
 }
 
-class NewProductForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      submitted: false,
-    };
+function NewProductForm(props) {
+  const [hasSubmitted, setHasSubmitted] = useState (false);
+  
 
-    this.setSubmitted = this.setSubmitted.bind(this);
-  }
-
-  setSubmitted() {
+  const setSubmitted = () => {
     setTimeout(() => {
-      this.setState({
-        submitted: true,
-      });
+      setHasSubmitted(true
+     );
     }, 500);
   }
 
-  render() {
-    const { submitted } = this.state;
-    const { saveNewProduct } = this.props;
+
+    const { saveNewProduct } = props;
 
     return (
       <>
@@ -74,7 +67,7 @@ class NewProductForm extends Component {
             const newProduct = addProductDetails(values);
             saveNewProduct(newProduct);
             setSubmitting(true);
-            this.setSubmitted();
+            setSubmitted();
           }}
         >
           {({
@@ -194,10 +187,9 @@ class NewProductForm extends Component {
             </form>
           )}
         </Formik>
-        {submitted && <Redirect to="/" />}
+        {hasSubmitted && <Redirect to="/" />}
       </>
     );
   }
-}
 
 export default NewProductForm;
